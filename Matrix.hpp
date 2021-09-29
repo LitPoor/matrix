@@ -52,9 +52,8 @@ public:
     template<typename K>
     bool operator==(Matrix<K> &m) const;
 
-
     template<typename K>
-    Matrix<K>& operator=(Matrix<K> &m);
+    Matrix<K> &operator=(Matrix<K> &m);
 
     template<typename K, typename V>
     Matrix<V> operator+(Matrix<K> &m);
@@ -186,6 +185,7 @@ T Matrix<T>::getElement(int rows, int cols)
 }
 
 
+///判断矩阵是否相等，如果为浮点型矩阵的话，各个部分相对应的值之间的差小于1e-9则认为相等
 template<typename T>
 template<typename K>
 bool Matrix<T>::operator==(Matrix<K> &m) const
@@ -196,7 +196,7 @@ bool Matrix<T>::operator==(Matrix<K> &m) const
     {
         for (int i = 0; i < rows; i++)
             for (int j = 0; j < cols; j++)
-                if (this->matrix[i][j] != m.matrix[i][j])
+                if (this->matrix[i][j] - m.matrix[i][j] > 1e-9)
                     return false;
         return true;
     }
@@ -205,8 +205,15 @@ bool Matrix<T>::operator==(Matrix<K> &m) const
 
 template<typename T>
 template<typename K>
-Matrix<K>& Matrix<T>::operator=(Matrix<K> &m)
+Matrix<K> &Matrix<T>::operator=(Matrix<K> &m)
 {
+    string s1 = typeid(this->matrix[0][0]).name(); //获取矩阵的数据类型，该返回值为一个字符串常量
+    string s2 = typeid(m.matrix[0][0]).name();
+    if (s1 != s2)
+    {
+        cout << "Error: 用于赋值的两矩阵类型应该相同";
+        exit(0);
+    }
     this->rows = m.rows;
     this->cols = m.cols;
     this->matrix = m.matrix;
