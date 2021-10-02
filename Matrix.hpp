@@ -53,10 +53,10 @@ public:
     bool operator==(Matrix<K> &m) const;
 
     template<typename K>
-    Matrix<K> &operator=(Matrix<K> &m);
+    Matrix<K> &operator=(const Matrix<K> &m);
 
-    template<typename K, typename V>
-    Matrix<V> operator+(Matrix<K> &m);
+    template<typename K>
+    Matrix<double> operator+(const Matrix<K> &m);
 
 
 };
@@ -205,7 +205,7 @@ bool Matrix<T>::operator==(Matrix<K> &m) const
 
 template<typename T>
 template<typename K>
-Matrix<K> &Matrix<T>::operator=(Matrix<K> &m)
+Matrix<K> &Matrix<T>::operator=(const Matrix<K> &m)
 {
     string s1 = typeid(this->matrix[0][0]).name(); //获取矩阵的数据类型，该返回值为一个字符串常量
     string s2 = typeid(m.matrix[0][0]).name();
@@ -221,9 +221,12 @@ Matrix<K> &Matrix<T>::operator=(Matrix<K> &m)
 }
 
 
+
+///之前打算把返回值也用模板类来写，但是c++与函数返回值相关的模板参数其值也无法推导
+///然后调用就相当麻烦，如  m.operator+<int>() ，所以打算全部用double作为返回值
 template<typename T>
-template<typename K, typename V>
-Matrix<V> Matrix<T>::operator+(Matrix<K> &m)
+template<typename K>
+Matrix<double> Matrix<T>::operator+(const Matrix<K> &m)
 {
     if (m.rows != this->rows || m.cols != this->cols)
     {
@@ -247,9 +250,6 @@ Matrix<V> Matrix<T>::operator+(Matrix<K> &m)
     }
 
 
-    ///如果运算的矩阵有一个类型为浮点型，则返回矩阵的类型为double
-    if (s1 == "f" || s1 == "e" || s1 == "d" || s2 == "f" || s2 == "e" || s2 == "d")
-    {
         vector<double> v(cols);
         vector<vector<double>> vv;
 
@@ -262,35 +262,7 @@ Matrix<V> Matrix<T>::operator+(Matrix<K> &m)
         }
 
         return Matrix<double>(vv);
-    } else if (s1 == "x" || s2 == "x")   //如果运算的矩阵有一个类型为long long，则返回矩阵的类型为long long
-    {
-        vector<long long> v(cols);
-        vector<vector<long long>> vv;
 
-        for (int i = 0; i < rows; i++)
-        {
-            for (int j = 0; j < cols; j++)
-                v[j] = this->matrix[i][j] + m.matrix[i][j];
-
-            vv.push_back(v);
-        }
-
-        return Matrix<long long>(vv);
-    } else
-    {
-        vector<int> v(cols);
-        vector<vector<int>> vv;
-
-        for (int i = 0; i < rows; i++)
-        {
-            for (int j = 0; j < cols; j++)
-                v[j] = this->matrix[i][j] + m.matrix[i][j];
-
-            vv.push_back(v);
-        }
-
-        return Matrix<int>(vv);
-    }
 
 }
 
